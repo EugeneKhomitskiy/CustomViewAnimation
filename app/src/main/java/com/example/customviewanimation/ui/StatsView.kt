@@ -82,18 +82,19 @@ class StatsView @JvmOverloads constructor(
         var percent = 0F
         var portion : Float
         var startAngle = -90F
+        val rotation = 360 * progress
 
         data.forEachIndexed { index, datum ->
             portion = datum / data.sum()
             val angle = portion * 360
             paint.color = colors.getOrElse(index) { generateRandomColor() }
-            canvas.drawArc(oval, startAngle, angle * progress, false, paint)
+            canvas.drawArc(oval, startAngle + rotation, angle * progress, false, paint)
             startAngle += angle
             percent += portion
         }
 
         paint.color = colors[0]
-        canvas.drawArc(oval, startAngle, 1F, false, paint)
+        canvas.drawArc(oval, startAngle + rotation, 1F, false, paint)
 
         canvas.drawText(
             "%.2f%%".format(percent * 100),
