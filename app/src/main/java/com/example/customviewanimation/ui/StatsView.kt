@@ -79,29 +79,30 @@ class StatsView @JvmOverloads constructor(
             return
         }
 
-        var percent = 0F
-        var portion : Float
         var startAngle = -90F
-        val rotation = 360 * progress
+        val maxAngle = 360 * progress + startAngle
+        var percent = 0F
 
         data.forEachIndexed { index, datum ->
-            portion = datum / data.sum()
+            val portion = datum / data.sum()
             val angle = portion * 360
+            val rotationAngle = min(angle, maxAngle - startAngle)
             paint.color = colors.getOrElse(index) { generateRandomColor() }
-            canvas.drawArc(oval, startAngle + rotation, angle * progress, false, paint)
+            canvas.drawArc(oval, startAngle, rotationAngle, false, paint)
             startAngle += angle
             percent += portion
+            if (startAngle > maxAngle) return@onDraw
+
+            canvas.drawText(
+                "%.2f%%".format(percent * 100),
+                center.x,
+                center.y + textPaint.textSize / 4,
+                textPaint,
+            )
         }
 
         paint.color = colors[0]
-        canvas.drawArc(oval, startAngle + rotation, 1F, false, paint)
-
-        canvas.drawText(
-            "%.2f%%".format(percent * 100),
-            center.x,
-            center.y + textPaint.textSize / 4,
-            textPaint,
-        )
+        canvas.drawArc(oval, startAngle, 1F, false, paint)
     }
 
     private fun update() {
